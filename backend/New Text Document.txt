@@ -1,0 +1,1 @@
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/medusa # Make sure this database exist - or change connection string to an online database

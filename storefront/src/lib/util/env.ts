@@ -1,3 +1,3 @@
 export const getBaseURL = () => {
-  return process.env.NEXT_PUBLIC_BASE_URL || "https://localhost:8000"
+  return "http://192.168.1.101:8000"
 }

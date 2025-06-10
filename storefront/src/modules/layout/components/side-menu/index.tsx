@@ -31,7 +31,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                   data-testid="nav-menu-button"
                   className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
                 >
-                  Menu
+                  Меню
                 </Popover.Button>
               </div>
 
@@ -57,6 +57,12 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                     </div>
                     <ul className="flex flex-col gap-6 items-start justify-start">
                       {Object.entries(SideMenuItems).map(([name, href]) => {
+                        const displayName =
+                          name === "Home" ? "Головна" :
+                          name === "Store" ? "Магазин" :
+                          name === "Search" ? "Пошук" :
+                          name === "Account" ? "Обліковий запис" :
+                          name === "Cart" ? "Кошик" : name;
                         return (
                           <li key={name}>
                             <LocalizedClientLink
@@ -65,7 +71,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                               onClick={close}
                               data-testid={`${name.toLowerCase()}-link`}
                             >
-                              {name}
+                              {displayName}
                             </LocalizedClientLink>
                           </li>
                         )
@@ -91,7 +97,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                         />
                       </div>
                       <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Medusa Store. All rights
+                        © {new Date().getFullYear()} Torgash Store. All rights
                         reserved.
                       </Text>
                     </div>

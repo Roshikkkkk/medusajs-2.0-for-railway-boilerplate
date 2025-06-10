@@ -1,0 +1,16 @@
+# URL вашего бэкенда Medusa (должен быть запущен локально на порту 9000)
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
+
+# URL вашего фронтенда (по умолчанию Next.js работает на порту 8000)
+NEXT_PUBLIC_BASE_URL=http://localhost:8000
+
+# Регион по умолчанию для магазина
+NEXT_PUBLIC_DEFAULT_REGION=ua
+
+# MinIO для хранения изображений (оставьте закомментированным, если используете локальное хранилище)
+# NEXT_PUBLIC_MINIO_ENDPOINT=bucket-production-eaeb.up.railway.app
+
+# MeiliSearch для поиска (если не используете, можно оставить значения по умолчанию или закомментировать)
+NEXT_PUBLIC_SEARCH_ENDPOINT=http://localhost:7700
+NEXT_PUBLIC_SEARCH_API_KEY=your_search_key_here
+NEXT_PUBLIC_INDEX_NAME=products
