@@ -12,8 +12,8 @@ const Card = ({ category, index, isCentered }: { category: Category; index: numb
   const [isLoading, setIsLoading] = useState(false)
 
   const images = [
-    '/images/7.jpg',
-    '/images/8.jpg',
+    '/images/01.jpg',
+    '/images/02.jpg',
     '/images/01.jpg',
     '/images/04.jpg',
     '/images/7.jpg',
@@ -21,6 +21,9 @@ const Card = ({ category, index, isCentered }: { category: Category; index: numb
   ]
 
   const imageUrl = images[index % images.length] || '/images/default.jpg'
+
+  // Отладка: выводим description для каждой карточки
+  console.log(`Card ${index} (${category.name}): description =`, category.description)
 
   const handleClick = () => {
     setIsLoading(true)

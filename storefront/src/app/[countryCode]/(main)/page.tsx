@@ -22,6 +22,16 @@ export default async function Home({
   const region = await getRegion(countryCode)
   const { product_categories } = await getCategoriesList(0, 100) // Запрашиваем до 100 категорий
 
+  // Отладка: выводим данные категорий
+  console.log(
+    "Categories from API:",
+    product_categories.map(cat => ({
+      name: cat.name,
+      handle: cat.handle,
+      description: cat.description,
+    }))
+  )
+
   if (!collections || !region || !product_categories) {
     return null
   }
@@ -31,12 +41,8 @@ export default async function Home({
       <div className="mb-3">
         <Hero />
       </div>
-      <div className="mb-3">
-        <HeroSlider categories={product_categories} />
-      </div>
-      <div className="mb-3">
-        <HeroSliderProducts categories={product_categories} />
-      </div>
+      <HeroSlider categories={product_categories} />
+      <HeroSliderProducts categories={product_categories} />
       <div className="py-12">
         <ul className="flex flex-col gap-x-6">
           <FeaturedProducts collections={collections} region={region} />
