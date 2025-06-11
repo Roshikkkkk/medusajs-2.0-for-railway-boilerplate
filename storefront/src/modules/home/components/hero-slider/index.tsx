@@ -14,7 +14,7 @@ type HeroSliderProps = {
 }
 
 const HeroSlider = ({ categories }: HeroSliderProps) => {
-  const sliderRef = useRef(null)
+  const sliderRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
   const [centeredIndex, setCenteredIndex] = useState(0)
@@ -26,11 +26,11 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
 
       if (window.innerWidth < 768) {
-        const cardWidth = 309
+        const cardWidth = 260 // ширина карточки на мобильных
         const gap = 20
         const scrollAmount = cardWidth + gap
-        const centerPosition = scrollLeft + clientWidth / 2
-        const newCenteredIndex = Math.round(centerPosition / scrollAmount) - 1
+        const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2
+        const newCenteredIndex = Math.floor(centerPosition / scrollAmount)
         setCenteredIndex(Math.max(0, Math.min(categories.length - 1, newCenteredIndex)))
       } else {
         setCenteredIndex(-1)
@@ -40,7 +40,7 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
 
   const scroll = (direction: "left" | "right") => {
     if (sliderRef.current) {
-      const cardWidth = window.innerWidth >= 768 ? 400 : 309
+      const cardWidth = window.innerWidth >= 768 ? 372 : 260
       const gap = 20
       const scrollAmount = cardWidth + gap
       const scrollDistance = window.innerWidth >= 768 ? 2 * scrollAmount : scrollAmount
@@ -54,24 +54,24 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
   useEffect(() => {
     const slider = sliderRef.current
     if (slider) {
-      slider.addEventListener("scroll", checkScroll)
+      slider.addEventListener("scroll", checkScroll, { passive: true })
       checkScroll()
       return () => slider.removeEventListener("scroll", checkScroll)
     }
   }, [categories])
 
   return (
-    <div className="w-full border-t border-transparent relative bg-ui-bg-subtle">
-      <h2 className="text-[28px] md:text-[56px] font-bold pl-[60px] md:pl-[150px] mt-8 text-[#1D1D1F]">
+    <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
+      <h2 className="text-[28px] md:text-[56px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
         Популярні категорії
       </h2>
       <div
         ref={sliderRef}
-        className="w-full overflow-x-auto snap-x snap-mandatory hide-scrollbar px-[30px] py-[50px] mt-0 md:mt-[3vh] md:py-[75px]"
+        className="w-full overflow-x-auto snap-x snap-mandatory hide-scrollbar px-[30px] py-[50px] mt-0 md:mt-[3vh] md:py-[75px] max-md:scroll-px-[15px]"
         style={{ scrollPadding: "100px" }}
       >
         <div className="w-max h-full flex items-center gap-5">
-          <div className="w-[100px] h-full flex-shrink-0 snap-align-start" />
+          <div className="w-[100px] max-md:w-[1px] h-full flex-shrink-0 snap-align-start" />
           {categories.map((category, index) => (
             <Card
               key={category.id}
@@ -84,7 +84,6 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
         </div>
       </div>
 
-      {/* Точки-индикаторы для мобильной версии */}
       <div className="flex justify-center gap-2 pb-4 md:hidden">
         {categories.map((_, index) => (
           <span
@@ -145,6 +144,12 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
           -ms-overflow-style: none;
           scrollbar-width: none;
           scroll-behavior: smooth;
+        }
+        @media (min-width: 768px) {
+          .card:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease-in-out;
+          }
         }
       `}</style>
     </div>

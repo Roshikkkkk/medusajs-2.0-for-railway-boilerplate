@@ -28,7 +28,7 @@ export default async function Home({
 
   return (
     <>
-      <div className="mb-5">
+      <div className="mb-0">
         <Hero />
       </div>
       <HeroSlider categories={product_categories} />
