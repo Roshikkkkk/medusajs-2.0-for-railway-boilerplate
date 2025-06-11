@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { revalidateTag } from "next/cache"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import HeroSlider from "@modules/home/components/hero-slider"
@@ -18,11 +19,13 @@ export default async function Home({
 }: {
   params: { countryCode: string }
 }) {
+  // Инвалидируем кэш для категорий
+  revalidateTag("categories")
+
   const collections = await getCollectionsWithProducts(countryCode)
   const region = await getRegion(countryCode)
-  const { product_categories } = await getCategoriesList(0, 100) // Запрашиваем до 100 категорий
+  const { product_categories } = await getCategoriesList(0, 100)
 
-  // Отладка: выводим данные категорий
   console.log(
     "Categories from API:",
     product_categories.map(cat => ({
