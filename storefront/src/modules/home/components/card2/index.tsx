@@ -1,25 +1,20 @@
+"use client"
+
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { useState } from "react"
+import { HttpTypes } from "@medusajs/types"
 
-type Category = {
-  id: string
-  name: string
-  handle: string
+type CardProps = {
+  product: HttpTypes.StoreProduct
+  index: number
+  isCentered: boolean
 }
 
-const Card2 = ({ category, index, isCentered }: { category: Category; index: number; isCentered: boolean }) => {
+const Card2 = ({ product, index, isCentered }: CardProps) => {
   const [isLoading, setIsLoading] = useState(false)
 
-  const images = [
-    '/images/01.jpg',
-    '/images/03.jpg',
-    '/images/04.jpg',
-    '/images/05.jpg',
-    '/images/02.jpg',
-    '/images/05.jpg',
-  ]
-
-  const imageUrl = images[index % images.length] || '/images/default.jpg'
+  // Use the first thumbnail or a default image
+  const imageUrl = product.thumbnail || '/images/default.jpg'
 
   const handleClick = () => {
     setIsLoading(true)
@@ -27,15 +22,25 @@ const Card2 = ({ category, index, isCentered }: { category: Category; index: num
 
   return (
     <LocalizedClientLink
-      href={`/categories/${category.handle}`}
-      className={`w-[309px] h-[450px] md:w-[480px] md:h-[500px] snap-center flex-shrink-0 rounded-large flex flex-col items-center justify-end bg-cover bg-center relative overflow-hidden transition-transform duration-300 md:hover:scale-105 ${isCentered ? 'max-md:scale-105' : ''}`}
+      href={`/products/${product.handle}`}
+      className={`w-[309px] h-[500px] md:w-[480px] md:h-[500px] snap-center flex-shrink-0 rounded-large flex flex-col relative overflow-hidden transition-transform duration-300 md:hover:scale-105 ${isCentered ? 'max-md:scale-105' : ''}`}
       style={{
-        backgroundImage: `url(${imageUrl})`,
-        backgroundColor: imageUrl ? 'transparent' : '#e5e5e7',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
       }}
       onClick={handleClick}
     >
+      {/* Image: 408px (mobile), 404px (desktop) */}
+      <div
+        className="w-full h-[408px] md:h-[404px] bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${imageUrl})`,
+          backgroundColor: imageUrl ? 'transparent' : '#e5e5e7',
+        }}
+      />
+      {/* White block: 92px (mobile), 96px (desktop) */}
+      <div className="w-full h-[92px] md:h-[96px] bg-white" />
+
+      {/* Loader */}
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-[4px]">
           <div className="w-10 h-10 relative">

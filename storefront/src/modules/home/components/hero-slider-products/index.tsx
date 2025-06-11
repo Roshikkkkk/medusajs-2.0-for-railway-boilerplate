@@ -2,25 +2,20 @@
 
 import Card from "../card2"
 import { useEffect, useRef, useState } from "react"
-
-type Category = {
-  id: string
-  name: string
-  handle: string
-}
+import { HttpTypes } from "@medusajs/types"
 
 type HeroSliderProps = {
-  categories: Category[]
+  products: HttpTypes.StoreProduct[]
 }
 
-const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
+const HeroSliderProducts = ({ products }: HeroSliderProps) => {
   const sliderRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
   const [centeredIndex, setCenteredIndex] = useState(0)
 
-  // Limit categories to a maximum of 10
-  const displayedCategories = categories.slice(0, 10)
+  // Limit products to a maximum of 10
+  const displayedProducts = products.slice(0, 10)
 
   const checkScroll = () => {
     if (sliderRef.current) {
@@ -34,7 +29,7 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
         const scrollAmount = cardWidth + gap
         const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2
         const newCenteredIndex = Math.floor(centerPosition / scrollAmount)
-        setCenteredIndex(Math.max(0, Math.min(displayedCategories.length - 1, newCenteredIndex)))
+        setCenteredIndex(Math.max(0, Math.min(displayedProducts.length - 1, newCenteredIndex)))
       } else {
         setCenteredIndex(-1)
       }
@@ -63,7 +58,7 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       checkScroll()
       return () => slider.removeEventListener("scroll", checkScroll)
     }
-  }, [displayedCategories])
+  }, [displayedProducts])
 
   return (
     <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
@@ -77,10 +72,10 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       >
         <div className="w-max h-full flex items-center gap-5">
           <div className="w-[100px] max-md:w-[1px] h-full flex-shrink-0 snap-align-start" />
-          {displayedCategories.map((category, index) => (
+          {displayedProducts.map((product, index) => (
             <Card
-              key={category.id}
-              category={category}
+              key={product.id}
+              product={product}
               index={index}
               isCentered={index === centeredIndex}
             />
@@ -90,7 +85,7 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       </div>
 
       <div className="flex justify-center gap-2 pb-4 md:hidden">
-        {displayedCategories.map((_, index) => (
+        {displayedProducts.map((_, index) => (
           <span
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${

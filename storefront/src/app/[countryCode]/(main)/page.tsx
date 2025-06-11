@@ -7,6 +7,7 @@ import HeroSliderProducts from "@modules/home/components/hero-slider-products"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import { getCategoriesList } from "@lib/data/categories"
+import { getProductsListWithSort } from "@lib/data/products"
 
 export const metadata: Metadata = {
   title: "Medusa Next.js Starter Template",
@@ -19,12 +20,19 @@ export default async function Home({
 }: {
   params: { countryCode: string }
 }) {
-  // Инвалидируем кэш для категорий
+  // Инвалидируем кэш для категорий и продуктов
   revalidateTag("categories")
+  revalidateTag("products")
 
   const collections = await getCollectionsWithProducts(countryCode)
   const region = await getRegion(countryCode)
   const { product_categories } = await getCategoriesList(0, 100)
+  const { response: { products } } = await getProductsListWithSort({
+    page: 1,
+    queryParams: { limit: 10 },
+    sortBy: "created_at",
+    countryCode,
+  })
 
   console.log(
     "Categories from API:",
@@ -35,7 +43,7 @@ export default async function Home({
     }))
   )
 
-  if (!collections || !region || !product_categories) {
+  if (!collections || !region || !product_categories || !products) {
     return null
   }
 
@@ -47,7 +55,7 @@ export default async function Home({
       <div className="mb-0">
         <HeroSlider categories={product_categories} />
       </div>
-      <HeroSliderProducts categories={product_categories} />
+      <HeroSliderProducts products={products} />
       <div className="py-12">
         <ul className="flex flex-col gap-x-6">
           <FeaturedProducts collections={collections} region={region} />
