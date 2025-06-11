@@ -1,8 +1,8 @@
 import { Metadata } from "next"
-
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import HeroSlider from "@modules/home/components/hero-slider"
+import HeroSliderProducts from "@modules/home/components/hero-slider-products"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import { getCategoriesList } from "@lib/data/categories"
@@ -28,10 +28,15 @@ export default async function Home({
 
   return (
     <>
-      <div className="mb-0">
+      <div className="mb-3">
         <Hero />
       </div>
-      <HeroSlider categories={product_categories} />
+      <div className="mb-3">
+        <HeroSlider categories={product_categories} />
+      </div>
+      <div className="mb-3">
+        <HeroSliderProducts categories={product_categories} />
+      </div>
       <div className="py-12">
         <ul className="flex flex-col gap-x-6">
           <FeaturedProducts collections={collections} region={region} />

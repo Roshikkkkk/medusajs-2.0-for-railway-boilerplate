@@ -1,6 +1,6 @@
 "use client"
 
-import Card from "../card"
+import Card from "../card2"
 import { useEffect, useRef, useState } from "react"
 
 type Category = {
@@ -13,7 +13,7 @@ type HeroSliderProps = {
   categories: Category[]
 }
 
-const HeroSlider = ({ categories }: HeroSliderProps) => {
+const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
   const sliderRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
@@ -158,4 +158,4 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
   )
 }
 
-export default HeroSlider
+export default HeroSliderProducts
