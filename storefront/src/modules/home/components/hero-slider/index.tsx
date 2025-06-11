@@ -7,7 +7,6 @@ type Category = {
   id: string
   name: string
   handle: string
-  description?: string // Добавляем description как опциональное
 }
 
 type HeroSliderProps = {
@@ -19,6 +18,9 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
   const [centeredIndex, setCenteredIndex] = useState(0)
+
+  // Limit categories to a maximum of 10
+  const displayedCategories = categories.slice(0, 10)
 
   const checkScroll = () => {
     if (sliderRef.current) {
@@ -32,7 +34,7 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
         const scrollAmount = cardWidth + gap
         const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2
         const newCenteredIndex = Math.floor(centerPosition / scrollAmount)
-        setCenteredIndex(Math.max(0, Math.min(categories.length - 1, newCenteredIndex)))
+        setCenteredIndex(Math.max(0, Math.min(displayedCategories.length - 1, newCenteredIndex)))
       } else {
         setCenteredIndex(-1)
       }
@@ -41,14 +43,27 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
 
   const scroll = (direction: "left" | "right") => {
     if (sliderRef.current) {
-      const cardWidth = window.innerWidth >= 768 ? 372 : 260
+      const isDesktop = window.innerWidth >= 768
+      const cardWidth = isDesktop ? 372 : 260
       const gap = 20
       const scrollAmount = cardWidth + gap
-      const scrollDistance = window.innerWidth >= 768 ? 2 * scrollAmount : scrollAmount
-      sliderRef.current.scrollBy({
-        left: direction === "left" ? -scrollDistance : scrollDistance,
-        behavior: "smooth",
-      })
+
+      if (isDesktop) {
+        // On desktop, scroll to the start or end
+        const { scrollWidth, clientWidth } = sliderRef.current
+        const targetScroll = direction === "left" ? 0 : scrollWidth - clientWidth
+        sliderRef.current.scrollTo({
+          left: targetScroll,
+          behavior: "smooth",
+        })
+      } else {
+        // On mobile, keep the original scrolling behavior
+        const scrollDistance = scrollAmount
+        sliderRef.current.scrollBy({
+          left: direction === "left" ? -scrollDistance : scrollDistance,
+          behavior: "smooth",
+        })
+      }
     }
   }
 
@@ -59,7 +74,7 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
       checkScroll()
       return () => slider.removeEventListener("scroll", checkScroll)
     }
-  }, [categories])
+  }, [displayedCategories])
 
   return (
     <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
@@ -73,7 +88,7 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
       >
         <div className="w-max h-full flex items-center gap-5">
           <div className="w-[100px] max-md:w-[1px] h-full flex-shrink-0 snap-align-start" />
-          {categories.map((category, index) => (
+          {displayedCategories.map((category, index) => (
             <Card
               key={category.id}
               category={category}
@@ -86,7 +101,7 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
       </div>
 
       <div className="flex justify-center gap-2 pb-4 md:hidden">
-        {categories.map((_, index) => (
+        {displayedCategories.map((_, index) => (
           <span
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${

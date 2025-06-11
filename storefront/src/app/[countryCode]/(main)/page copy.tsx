@@ -44,9 +44,7 @@ export default async function Home({
       <div className="mb-3">
         <Hero />
       </div>
-      <div className="mb-0">
-        <HeroSlider categories={product_categories} />
-      </div>
+      <HeroSlider categories={product_categories} />
       <HeroSliderProducts categories={product_categories} />
       <div className="py-12">
         <ul className="flex flex-col gap-x-6">

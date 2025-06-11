@@ -19,6 +19,9 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
   const [canScrollRight, setCanScrollRight] = useState(true)
   const [centeredIndex, setCenteredIndex] = useState(0)
 
+  // Limit categories to a maximum of 10
+  const displayedCategories = categories.slice(0, 10)
+
   const checkScroll = () => {
     if (sliderRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current
@@ -26,12 +29,12 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
 
       if (window.innerWidth < 768) {
-        const cardWidth = 260
+        const cardWidth = 309
         const gap = 20
         const scrollAmount = cardWidth + gap
         const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2
         const newCenteredIndex = Math.floor(centerPosition / scrollAmount)
-        setCenteredIndex(Math.max(0, Math.min(categories.length - 1, newCenteredIndex)))
+        setCenteredIndex(Math.max(0, Math.min(displayedCategories.length - 1, newCenteredIndex)))
       } else {
         setCenteredIndex(-1)
       }
@@ -40,10 +43,12 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
 
   const scroll = (direction: "left" | "right") => {
     if (sliderRef.current) {
-      const cardWidth = window.innerWidth >= 768 ? 372 : 260
+      const isDesktop = window.innerWidth >= 768
+      const cardWidth = isDesktop ? 480 : 309
       const gap = 20
       const scrollAmount = cardWidth + gap
-      const scrollDistance = window.innerWidth >= 768 ? 2 * scrollAmount : scrollAmount
+      const scrollDistance = isDesktop ? 2 * scrollAmount : scrollAmount
+
       sliderRef.current.scrollBy({
         left: direction === "left" ? -scrollDistance : scrollDistance,
         behavior: "smooth",
@@ -58,12 +63,12 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       checkScroll()
       return () => slider.removeEventListener("scroll", checkScroll)
     }
-  }, [categories])
+  }, [displayedCategories])
 
   return (
     <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
       <h2 className="text-[28px] md:text-[48px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
-        Популярні категорії
+        Популярные товары
       </h2>
       <div
         ref={sliderRef}
@@ -72,7 +77,7 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       >
         <div className="w-max h-full flex items-center gap-5">
           <div className="w-[100px] max-md:w-[1px] h-full flex-shrink-0 snap-align-start" />
-          {categories.map((category, index) => (
+          {displayedCategories.map((category, index) => (
             <Card
               key={category.id}
               category={category}
@@ -85,7 +90,7 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       </div>
 
       <div className="flex justify-center gap-2 pb-4 md:hidden">
-        {categories.map((_, index) => (
+        {displayedCategories.map((_, index) => (
           <span
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${

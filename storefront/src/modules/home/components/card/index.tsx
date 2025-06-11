@@ -5,7 +5,7 @@ type Category = {
   id: string
   name: string
   handle: string
-  description?: string
+  description?: string // Описание опционально
 }
 
 const Card = ({ category, index, isCentered }: { category: Category; index: number; isCentered: boolean }) => {
@@ -18,12 +18,10 @@ const Card = ({ category, index, isCentered }: { category: Category; index: numb
     '/images/04.jpg',
     '/images/7.jpg',
     '/images/8.jpg',
+    '/images/03.jpg',
   ]
 
   const imageUrl = images[index % images.length] || '/images/default.jpg'
-
-  // Отладка: выводим description для каждой карточки
-  console.log(`Card ${index} (${category.name}): description =`, category.description)
 
   const handleClick = () => {
     setIsLoading(true)
@@ -46,7 +44,7 @@ const Card = ({ category, index, isCentered }: { category: Category; index: numb
       >
         {category.name}
       </span>
-      {category.description && (
+      {category.description && ( // Рендерим описание только если оно есть
         <span
           className="absolute top-12 left-4 text-[#1D1D1F] text-base md:text-xl font-medium md:font-normal text-left max-w-[220px] md:max-w-[320px]"
           style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)' }}
