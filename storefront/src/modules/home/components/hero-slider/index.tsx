@@ -62,7 +62,7 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
 
   return (
     <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
-      <h2 className="text-[28px] md:text-[56px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
+      <h2 className="text-[24px] md:text-[28px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
         Популярні категорії
       </h2>
       <div

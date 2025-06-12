@@ -44,7 +44,7 @@ const Card = ({ category, index, isCentered }: { category: Category; index: numb
       >
         {category.name}
       </span>
-      {category.description && ( // Рендерим описание только если оно есть
+      {category.description && (
         <span
           className="absolute top-12 left-4 text-[#1D1D1F] text-base md:text-xl font-medium md:font-normal text-left max-w-[220px] md:max-w-[320px]"
           style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.8)' }}
@@ -52,6 +52,24 @@ const Card = ({ category, index, isCentered }: { category: Category; index: numb
           {category.description}
         </span>
       )}
+      <button
+        className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ease-in-out max-md:flex hidden ${
+          isCentered
+            ? 'bg-[#DEDEE2] text-[#626263] hover:bg-[#D0D0D4]'
+            : 'bg-[#ECECEE] text-[#B8B8B9]'
+        }`}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          className="w-4 h-4"
+          strokeWidth={3}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-[4px]">
           <div className="w-10 h-10 relative">

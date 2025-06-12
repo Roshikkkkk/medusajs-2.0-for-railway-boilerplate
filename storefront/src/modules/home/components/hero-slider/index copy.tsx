@@ -1,6 +1,6 @@
 "use client"
 
-import Card from "../card2"
+import Card from "../card"
 import { useEffect, useRef, useState } from "react"
 
 type Category = {
@@ -13,14 +13,11 @@ type HeroSliderProps = {
   categories: Category[]
 }
 
-const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
+const HeroSlider = ({ categories }: HeroSliderProps) => {
   const sliderRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
   const [centeredIndex, setCenteredIndex] = useState(0)
-
-  // Limit categories to a maximum of 10
-  const displayedCategories = categories.slice(0, 10)
 
   const checkScroll = () => {
     if (sliderRef.current) {
@@ -29,12 +26,12 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
 
       if (window.innerWidth < 768) {
-        const cardWidth = 309
+        const cardWidth = 260
         const gap = 20
         const scrollAmount = cardWidth + gap
         const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2
         const newCenteredIndex = Math.floor(centerPosition / scrollAmount)
-        setCenteredIndex(Math.max(0, Math.min(displayedCategories.length - 1, newCenteredIndex)))
+        setCenteredIndex(Math.max(0, Math.min(categories.length - 1, newCenteredIndex)))
       } else {
         setCenteredIndex(-1)
       }
@@ -43,27 +40,14 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
 
   const scroll = (direction: "left" | "right") => {
     if (sliderRef.current) {
-      const isDesktop = window.innerWidth >= 768
-      const cardWidth = isDesktop ? 480 : 309
+      const cardWidth = window.innerWidth >= 768 ? 372 : 260
       const gap = 20
       const scrollAmount = cardWidth + gap
-
-      if (isDesktop) {
-        // On desktop, scroll to the start or end
-        const { scrollWidth, clientWidth } = sliderRef.current
-        const targetScroll = direction === "left" ? 0 : scrollWidth - clientWidth
-        sliderRef.current.scrollTo({
-          left: targetScroll,
-          behavior: "smooth",
-        })
-      } else {
-        // On mobile, keep the original scrolling behavior
-        const scrollDistance = scrollAmount
-        sliderRef.current.scrollBy({
-          left: direction === "left" ? -scrollDistance : scrollDistance,
-          behavior: "smooth",
-        })
-      }
+      const scrollDistance = window.innerWidth >= 768 ? 2 * scrollAmount : scrollAmount
+      sliderRef.current.scrollBy({
+        left: direction === "left" ? -scrollDistance : scrollDistance,
+        behavior: "smooth",
+      })
     }
   }
 
@@ -74,12 +58,12 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       checkScroll()
       return () => slider.removeEventListener("scroll", checkScroll)
     }
-  }, [displayedCategories])
+  }, [categories])
 
   return (
     <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
-      <h2 className="text-[24px] md:text-[28px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
-        Популярные товары
+      <h2 className="text-[28px] md:text-[56px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
+        Популярні категорії
       </h2>
       <div
         ref={sliderRef}
@@ -88,7 +72,7 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       >
         <div className="w-max h-full flex items-center gap-5">
           <div className="w-[100px] max-md:w-[1px] h-full flex-shrink-0 snap-align-start" />
-          {displayedCategories.map((category, index) => (
+          {categories.map((category, index) => (
             <Card
               key={category.id}
               category={category}
@@ -101,7 +85,7 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       </div>
 
       <div className="flex justify-center gap-2 pb-4 md:hidden">
-        {displayedCategories.map((_, index) => (
+        {categories.map((_, index) => (
           <span
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
@@ -174,4 +158,4 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
   )
 }
 
-export default HeroSliderProducts
+export default HeroSlider
