@@ -1,6 +1,5 @@
 import { Metadata } from "next"
 import { revalidateTag } from "next/cache"
-// import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import HeroSlider from "@modules/home/components/hero-slider"
 import HeroSliderProducts from "@modules/home/components/hero-slider-products"
@@ -9,7 +8,7 @@ import { getRegion } from "@lib/data/regions"
 import { getCategoriesList } from "@lib/data/categories"
 
 export const metadata: Metadata = {
-  title: "Medusa Next.js Starter Template",
+  title: "Torgash store",
   description:
     "A performant frontend ecommerce starter template with Next.js 14 and Medusa.",
 }
@@ -19,8 +18,8 @@ export default async function Home({
 }: {
   params: { countryCode: string }
 }) {
-  // Инвалидируем кэш для категорий
   revalidateTag("categories")
+  revalidateTag("collections")
 
   const collections = await getCollectionsWithProducts(countryCode)
   const region = await getRegion(countryCode)
@@ -28,10 +27,18 @@ export default async function Home({
 
   console.log(
     "Categories from API:",
-    product_categories.map(cat => ({
+    product_categories.map((cat) => ({
       name: cat.name,
       handle: cat.handle,
       description: cat.description,
+    }))
+  )
+  console.log(
+    "Collections from API:",
+    collections?.map((col) => ({
+      id: col.id,
+      title: col.title,
+      handle: col.handle,
     }))
   )
 
@@ -41,18 +48,17 @@ export default async function Home({
 
   return (
     <>
-      <div className="mb-">
+      <div className="mb-3">
         <Hero />
       </div>
       <div className="mb-0">
         <HeroSlider categories={product_categories} />
       </div>
-      <HeroSliderProducts categories={product_categories} />
-      <div className="py-12">
-        {/* <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul> */}
-      </div>
+      <HeroSliderProducts
+        categories={product_categories}
+        collections={collections}
+      />
+      <div className="py-12"></div>
     </>
   )
 }

@@ -2,6 +2,7 @@
 
 import Card from "../card2"
 import { useEffect, useRef, useState } from "react"
+import { HttpTypes } from "@medusajs/types"
 
 type Category = {
   id: string
@@ -11,9 +12,10 @@ type Category = {
 
 type HeroSliderProps = {
   categories: Category[]
+  collections: HttpTypes.StoreCollection[]
 }
 
-const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
+const HeroSliderProducts = ({ categories, collections }: HeroSliderProps) => {
   const sliderRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
@@ -47,23 +49,12 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       const cardWidth = isDesktop ? 480 : 309
       const gap = 20
       const scrollAmount = cardWidth + gap
+      const scrollDistance = isDesktop ? 2 * scrollAmount : scrollAmount
 
-      if (isDesktop) {
-        // On desktop, scroll to the start or end
-        const { scrollWidth, clientWidth } = sliderRef.current
-        const targetScroll = direction === "left" ? 0 : scrollWidth - clientWidth
-        sliderRef.current.scrollTo({
-          left: targetScroll,
-          behavior: "smooth",
-        })
-      } else {
-        // On mobile, keep the original scrolling behavior
-        const scrollDistance = scrollAmount
-        sliderRef.current.scrollBy({
-          left: direction === "left" ? -scrollDistance : scrollDistance,
-          behavior: "smooth",
-        })
-      }
+      sliderRef.current.scrollBy({
+        left: direction === "left" ? -scrollDistance : scrollDistance,
+        behavior: "smooth",
+      })
     }
   }
 
@@ -72,7 +63,9 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
     if (slider) {
       slider.addEventListener("scroll", checkScroll, { passive: true })
       checkScroll()
-      return () => slider.removeEventListener("scroll", checkScroll)
+    }
+    return () => {
+      if (slider) slider.removeEventListener("scroll", checkScroll)
     }
   }, [displayedCategories])
 
@@ -81,6 +74,34 @@ const HeroSliderProducts = ({ categories }: HeroSliderProps) => {
       <h2 className="text-[28px] md:text-[48px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
         Популярные товары
       </h2>
+
+      {/* Button Slider */}
+      <div className="w-full mt-4">
+        <div className="relative">
+          <div
+            className="w-full overflow-x-auto hide-scrollbar flex gap-2 py-2 pl-[45px] max-md:scroll-px-[45px] max-md:snap-x md:pl-[150px]"
+          >
+            {collections && collections.length > 0 ? (
+              collections.map((collection) => (
+                <button
+                  key={collection.id}
+                  className="px-4 py-2 text-sm md:px-6 md:py-3 md:text-lg font-medium text-[#1D1D1F] bg-[#E8E8ED] rounded-md hover:bg-[#D8D8DD] transition-colors whitespace-nowrap snap-start"
+                >
+                  {collection.title}
+                </button>
+              ))
+            ) : (
+              <button
+                className="px-4 py-2 text-sm md:px-6 md:py-3 md:text-lg font-medium text-[#1D1D1F] bg-[#E8E8ED] rounded-md hover:bg-[#D8D8DD] transition-colors whitespace-nowrap snap-start"
+              >
+                Без коллекций
+              </button>
+            )}
+            <div className="w-[100px] flex-shrink-0" />
+          </div>
+        </div>
+      </div>
+
       <div
         ref={sliderRef}
         className="w-full overflow-x-auto snap-x snap-mandatory hide-scrollbar px-[30px] py-[50px] mt-0 md:mt-[3vh] md:py-[75px] max-md:scroll-px-[15px]"
