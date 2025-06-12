@@ -4,18 +4,25 @@ import Card from "../card2"
 import { useEffect, useRef, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 
-type HeroSliderProps = {
-  products: HttpTypes.StoreProduct[]
+type Category = {
+  id: string
+  name: string
+  handle: string
 }
 
-const HeroSliderProducts = ({ products }: HeroSliderProps) => {
+type HeroSliderProps = {
+  categories: Category[]
+  collections: HttpTypes.StoreCollection[]
+}
+
+const HeroSliderProducts = ({ categories, collections }: HeroSliderProps) => {
   const sliderRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
   const [centeredIndex, setCenteredIndex] = useState(0)
 
-  // Limit products to a maximum of 10
-  const displayedProducts = products.slice(0, 10)
+  // Limit categories to a maximum of 10
+  const displayedCategories = categories.slice(0, 10)
 
   const checkScroll = () => {
     if (sliderRef.current) {
@@ -29,7 +36,7 @@ const HeroSliderProducts = ({ products }: HeroSliderProps) => {
         const scrollAmount = cardWidth + gap
         const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2
         const newCenteredIndex = Math.floor(centerPosition / scrollAmount)
-        setCenteredIndex(Math.max(0, Math.min(displayedProducts.length - 1, newCenteredIndex)))
+        setCenteredIndex(Math.max(0, Math.min(displayedCategories.length - 1, newCenteredIndex)))
       } else {
         setCenteredIndex(-1)
       }
@@ -56,15 +63,45 @@ const HeroSliderProducts = ({ products }: HeroSliderProps) => {
     if (slider) {
       slider.addEventListener("scroll", checkScroll, { passive: true })
       checkScroll()
-      return () => slider.removeEventListener("scroll", checkScroll)
     }
-  }, [displayedProducts])
+    return () => {
+      if (slider) slider.removeEventListener("scroll", checkScroll)
+    }
+  }, [displayedCategories])
 
   return (
     <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
       <h2 className="text-[28px] md:text-[48px] font-bold pl-[45px] md:pl-[150px] mt-8 text-[#1D1D1F]">
         Популярные товары
       </h2>
+
+      {/* Button Slider */}
+      <div className="w-full mt-4">
+        <div className="relative">
+          <div
+            className="w-full overflow-x-auto hide-scrollbar flex gap-2 py-2 pl-[45px] max-md:scroll-px-[45px] max-md:snap-x md:pl-[150px]"
+          >
+            {collections && collections.length > 0 ? (
+              collections.map((collection) => (
+                <button
+                  key={collection.id}
+                  className="px-4 py-2 text-sm md:px-6 md:py-3 md:text-lg font-medium text-[#1D1D1F] bg-[#E8E8ED] rounded-md hover:bg-[#D8D8DD] transition-colors whitespace-nowrap snap-start"
+                >
+                  {collection.title}
+                </button>
+              ))
+            ) : (
+              <button
+                className="px-4 py-2 text-sm md:px-6 md:py-3 md:text-lg font-medium text-[#1D1D1F] bg-[#E8E8ED] rounded-md hover:bg-[#D8D8DD] transition-colors whitespace-nowrap snap-start"
+              >
+                Без коллекций
+              </button>
+            )}
+            <div className="w-[100px] flex-shrink-0" />
+          </div>
+        </div>
+      </div>
+
       <div
         ref={sliderRef}
         className="w-full overflow-x-auto snap-x snap-mandatory hide-scrollbar px-[30px] py-[50px] mt-0 md:mt-[3vh] md:py-[75px] max-md:scroll-px-[15px]"
@@ -72,10 +109,10 @@ const HeroSliderProducts = ({ products }: HeroSliderProps) => {
       >
         <div className="w-max h-full flex items-center gap-5">
           <div className="w-[100px] max-md:w-[1px] h-full flex-shrink-0 snap-align-start" />
-          {displayedProducts.map((product, index) => (
+          {displayedCategories.map((category, index) => (
             <Card
-              key={product.id}
-              product={product}
+              key={category.id}
+              category={category}
               index={index}
               isCentered={index === centeredIndex}
             />
@@ -85,7 +122,7 @@ const HeroSliderProducts = ({ products }: HeroSliderProps) => {
       </div>
 
       <div className="flex justify-center gap-2 pb-4 md:hidden">
-        {displayedProducts.map((_, index) => (
+        {displayedCategories.map((_, index) => (
           <span
             key={index}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${

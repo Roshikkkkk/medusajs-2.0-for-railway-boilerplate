@@ -1,13 +1,11 @@
 import { Metadata } from "next"
 import { revalidateTag } from "next/cache"
-import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import HeroSlider from "@modules/home/components/hero-slider"
 import HeroSliderProducts from "@modules/home/components/hero-slider-products"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import { getCategoriesList } from "@lib/data/categories"
-import { getProductsListWithSort } from "@lib/data/products"
 
 export const metadata: Metadata = {
   title: "Medusa Next.js Starter Template",
@@ -20,30 +18,31 @@ export default async function Home({
 }: {
   params: { countryCode: string }
 }) {
-  // Инвалидируем кэш для категорий и продуктов
   revalidateTag("categories")
-  revalidateTag("products")
+  revalidateTag("collections")
 
   const collections = await getCollectionsWithProducts(countryCode)
   const region = await getRegion(countryCode)
   const { product_categories } = await getCategoriesList(0, 100)
-  const { response: { products } } = await getProductsListWithSort({
-    page: 1,
-    queryParams: { limit: 10 },
-    sortBy: "created_at",
-    countryCode,
-  })
 
   console.log(
     "Categories from API:",
-    product_categories.map(cat => ({
+    product_categories.map((cat) => ({
       name: cat.name,
       handle: cat.handle,
       description: cat.description,
     }))
   )
+  console.log(
+    "Collections from API:",
+    collections?.map((col) => ({
+      id: col.id,
+      title: col.title,
+      handle: col.handle,
+    }))
+  )
 
-  if (!collections || !region || !product_categories || !products) {
+  if (!collections || !region || !product_categories) {
     return null
   }
 
@@ -52,15 +51,14 @@ export default async function Home({
       <div className="mb-3">
         <Hero />
       </div>
-      <div className="mb-0">
+      <div className="mb-3">
         <HeroSlider categories={product_categories} />
       </div>
-      <HeroSliderProducts products={products} />
-      <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul>
-      </div>
+      <HeroSliderProducts
+        categories={product_categories}
+        collections={collections}
+      />
+      <div className="py-12"></div>
     </>
   )
 }
