@@ -1,64 +1,75 @@
-"use client"
+"use client";
 
-import Card from "../card"
-import { useEffect, useRef, useState } from "react"
+import Card from "../card";
+import { useEffect, useRef, useState } from "react";
+import LocalizedClientLink from "@modules/common/components/localized-client-link";
+import { useParams } from "next/navigation";
 
 type Category = {
-  id: string
-  name: string
-  handle: string
-}
+  id: string;
+  name: string;
+  handle: string;
+  description?: string;
+};
 
 type HeroSliderProps = {
-  categories: Category[]
-}
+  categories: Category[];
+  countryCode?: string; // Добавляем countryCode как опциональный пропс
+};
 
-const HeroSlider = ({ categories }: HeroSliderProps) => {
-  const sliderRef = useRef<HTMLDivElement>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
-  const [centeredIndex, setCenteredIndex] = useState(0)
+const HeroSlider: React.FC<HeroSliderProps> = ({ categories, countryCode }) => {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [centeredIndex, setCenteredIndex] = useState(0);
+
+  // Ограничиваем до 7 категорий
+  const displayedCategories = categories.slice(0, 7);
 
   const checkScroll = () => {
     if (sliderRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1)
+      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
 
       if (window.innerWidth < 768) {
-        const cardWidth = 260
-        const gap = 20
-        const scrollAmount = cardWidth + gap
-        const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2
-        const newCenteredIndex = Math.floor(centerPosition / scrollAmount)
-        setCenteredIndex(Math.max(0, Math.min(categories.length - 1, newCenteredIndex)))
+        const cardWidth = 309;
+        const gap = 20;
+        const scrollAmount = cardWidth + gap;
+        const centerPosition = scrollLeft + clientWidth / 2 - cardWidth / 2;
+        const newCenteredIndex = Math.floor(centerPosition / scrollAmount);
+        setCenteredIndex(Math.max(0, Math.min(displayedCategories.length - 1, newCenteredIndex)));
       } else {
-        setCenteredIndex(-1)
+        setCenteredIndex(-1);
       }
     }
-  }
+  };
 
   const scroll = (direction: "left" | "right") => {
     if (sliderRef.current) {
-      const cardWidth = window.innerWidth >= 768 ? 372 : 260
-      const gap = 20
-      const scrollAmount = cardWidth + gap
-      const scrollDistance = window.innerWidth >= 768 ? 2 * scrollAmount : scrollAmount
+      const cardWidth = window.innerWidth >= 768 ? 480 : 309;
+      const gap = 20;
+      const scrollAmount = cardWidth + gap;
+      const scrollDistance = window.innerWidth >= 768 ? 2 * scrollAmount : scrollAmount;
       sliderRef.current.scrollBy({
         left: direction === "left" ? -scrollDistance : scrollDistance,
         behavior: "smooth",
-      })
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    const slider = sliderRef.current
+    const slider = sliderRef.current;
     if (slider) {
-      slider.addEventListener("scroll", checkScroll, { passive: true })
-      checkScroll()
-      return () => slider.removeEventListener("scroll", checkScroll)
+      slider.addEventListener("scroll", checkScroll, { passive: true });
+      checkScroll();
+      return () => slider.removeEventListener("scroll", checkScroll);
     }
-  }, [categories])
+  }, [displayedCategories]);
+
+  // Если countryCode не передан через пропсы, берём из useParams
+  const params = useParams();
+  const currentCountryCode = countryCode || (params?.countryCode as string);
 
   return (
     <div className="w-full border-t border-transparent relative bg-[#F5F5F7]">
@@ -72,11 +83,10 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
       >
         <div className="w-max h-full flex items-center gap-5">
           <div className="w-[100px] max-md:w-[1px] h-full flex-shrink-0 snap-align-start" />
-          {categories.map((category, index) => (
+          {displayedCategories.map((category, index) => (
             <Card
               key={category.id}
               category={category}
-              index={index}
               isCentered={index === centeredIndex}
             />
           ))}
@@ -84,18 +94,49 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
         </div>
       </div>
 
-      <div className="flex justify-center gap-2 pb-4 md:hidden">
-        {categories.map((_, index) => (
-          <span
-            key={index}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === centeredIndex ? "bg-[#007AFF] scale-125" : "bg-gray-400"
+      <div className="flex justify-center items-center h-8 pb-4 md:hidden">
+        <div className="relative flex justify-center items-center">
+          <div
+            className={`absolute flex justify-center items-center gap-2 transition-all duration-300 ease-in-out ${
+              centeredIndex === displayedCategories.length - 1
+                ? "opacity-0 scale-95 pointer-events-none"
+                : "opacity-100 scale-100"
             }`}
-          />
-        ))}
+          >
+            {displayedCategories.map((_, index) => (
+              <span
+                key={index}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === centeredIndex ? "bg-[#007AFF] scale-125" : "bg-gray-400"
+                }`}
+              />
+            ))}
+          </div>
+          <LocalizedClientLink
+            href={`/[countryCode]/store`}
+            as={`/${currentCountryCode}/store`}
+            className={`flex items-center gap-1 px-5 py-2 bg-[#DEDEE2] text-[#626263] rounded-full text-[15px] font-medium transition-all duration-300 ease-in-out hover:bg-[#D0D0D4] ${
+              centeredIndex === displayedCategories.length - 1
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-95 pointer-events-none"
+            }`}
+          >
+            Усі категорії
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-4 h-4"
+              strokeWidth={3}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </LocalizedClientLink>
+        </div>
       </div>
 
-      <div className="flex justify-center gap-4 pb-8 md:flex hidden" style={{ marginLeft: '1500px' }}>
+      <div className="flex justify-center gap-4 pb-8 md:flex hidden" style={{ marginLeft: "1500px" }}>
         <button
           onClick={() => scroll("left")}
           disabled={!canScrollLeft}
@@ -147,15 +188,9 @@ const HeroSlider = ({ categories }: HeroSliderProps) => {
           scrollbar-width: none;
           scroll-behavior: smooth;
         }
-        @media (min-width: 768px) {
-          .card:hover {
-            transform: scale(1.05);
-            transition: transform 0.3s ease-in-out;
-          }
-        }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default HeroSlider
+export default HeroSlider;
